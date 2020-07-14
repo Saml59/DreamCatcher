@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="DC.Views.LoginPage">
+
+    <ContentPage.Content>
+        <StackLayout x:Name="MasterLayout">
+
+            <StackLayout x:Name="LogoStack">
+                <Image x:Name="Logo" Source="DCLogo.png" Margin="0,80,0,0"/>
+
+            </StackLayout>
+
+            <StackLayout x:Name="LoginEntries">
+                <!--Padding for the top of the screen-->
+                <StackLayout.Padding>
+                    <OnIdiom x:TypeArguments="Thickness">
+                        <OnIdiom.Phone>40,0,40,0</OnIdiom.Phone>
+                        <OnIdiom.Tablet>140,150,140,0</OnIdiom.Tablet>
+                    </OnIdiom>
+                </StackLayout.Padding>
+                <ActivityIndicator x:Name="ActivitySpinner" Color="Red" IsRunning="True"/>
+                <Label x:Name="Lb_Username" Text="Username"/>
+                <Entry x:Name="En_Username" Placeholder="Username"/>
+                <Label x:Name="Lb_Password" Text="Password"/>
+                <Entry x:Name="En_Password" Placeholder="Password"/>
+                <Button x:Name="SignIn_Btn" Text="Sign in" Clicked="SignInProcess"/>
+
+        </StackLayout>
+    </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
