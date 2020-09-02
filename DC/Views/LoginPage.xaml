@@ -5,6 +5,7 @@
         <StackLayout x:Name="MasterLayout">
 
             <StackLayout x:Name="LogoStack">
+                <Label x:Name="Lb_NoInternet" HorizontalTextAlignment="Center" TextColor="White" BackgroundColor="Red"/>
                 <Image x:Name="Logo" Source="DCLogo.png" Margin="0,80,0,0"/>
 
             </StackLayout>
@@ -21,7 +22,7 @@
                 <Label x:Name="Lb_Username" Text="Username"/>
                 <Entry x:Name="En_Username" Placeholder="Username"/>
                 <Label x:Name="Lb_Password" Text="Password"/>
-                <Entry x:Name="En_Password" Placeholder="Password"/>
+                <Entry x:Name="En_Password" Placeholder="Password" IsSpellCheckEnabled="False" IsTextPredictionEnabled="True" IsPassword="True"/>
                 <Button x:Name="SignIn_Btn" Text="Sign in" Clicked="SignInProcess"/>
 
         </StackLayout>

@@ -3,8 +3,12 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using DC.Services;
+using DC.Views.Menu;
 using DC.Views;
 using DC.Data;
+using DC.Models;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DC
 {
@@ -16,8 +20,12 @@ namespace DC
         public static string AzureBackendUrl =
             DeviceInfo.Platform == DevicePlatform.Android ? "http://10.0.2.2:5000" : "http://localhost:5000";
         public static bool UseMockDataStore = true;
-        public static TokenDatabaseController tokenDB;
-        public static UserDatabaseController userDB;
+        static TokenDatabaseController tokenDB;
+        static UserDatabaseController userDB;
+        static RestService restService;
+        public static Label LabelScreen;
+        public static Timer timer;
+        public static bool HasInternet;
 
         public App()
         {
@@ -27,7 +35,20 @@ namespace DC
                 DependencyService.Register<MockDataStore>();
             else
                 DependencyService.Register<AzureDataStore>();
-            MainPage = new LoginPage();
+            //TODO check if already logged in
+            NavigationPage nav = new NavigationPage();
+            if (!Constant.LoggedIn)
+            {
+                LoginPage lgin = new LoginPage();
+                nav.PushAsync(lgin);
+            }
+            else
+            {
+                Dashboard dash = new Dashboard();
+                nav.PushAsync(dash);
+            }
+            
+            MainPage = nav;
         }
 
         protected override void OnStart()
@@ -64,5 +85,20 @@ namespace DC
                 return userDB;
             }
         }
+
+        public static RestService RestService
+        {
+            get{
+                if (restService == null) {
+                    restService = new RestService();
+                }
+                return restService;
+            }
+        }
+
+        
+
+  
     }
+    
 }
