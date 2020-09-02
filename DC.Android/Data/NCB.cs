@@ -14,6 +14,7 @@ namespace DC.Droid.Data
         }
         public override void OnLost(Network network)
         {
+            base.OnLost(network);
             connected = false;
         }
     }
