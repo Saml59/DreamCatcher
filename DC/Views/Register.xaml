@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Class="DC.Views.Register">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label x:Name="Lb_FirstName" Text="First Name"/>
+            <Entry x:Name="En_FirstName" Placeholder="First Name"/>
+            <Label x:Name="Lb_LastName" Text="Last Name"/>
+            <Entry x:Name="En_LastName" Placeholder="Last Name"/>
+            <Label x:Name="Lb_Username" Text="Username (Min. 8 characters)"/>
+            <Entry x:Name="En_Username" Placeholder="Username"/>
+            <Label x:Name="Lb_Password" Text="Password (Min. 8 Characters)"/>
+            <Entry x:Name="En_Password" Placeholder="Password" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+            <Label x:Name="Lb_Password_Confirm" Text="Confirm Password"/>
+            <Entry x:Name="En_Password_Confirm" Placeholder="Confirm Password" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+            <Label x:Name="Lb_DOB" Text="Birthdate"/>
+            <DatePicker x:Name="Birthdate" Date="{Binding Date}"/>
+            <Button x:Name="CA" Text="Create Account" Clicked="createAccount"/>
+
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

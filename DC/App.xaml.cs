@@ -5,7 +5,6 @@ using Xamarin.Forms.Xaml;
 using DC.Services;
 using DC.Views.Menu;
 using DC.Views;
-using DC.Data;
 using DC.Models;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +19,10 @@ namespace DC
         public static string AzureBackendUrl =
             DeviceInfo.Platform == DevicePlatform.Android ? "http://10.0.2.2:5000" : "http://localhost:5000";
         public static bool UseMockDataStore = true;
-        static TokenDatabaseController tokenDB;
-        static UserDatabaseController userDB;
-        static RestService restService;
         public static Label LabelScreen;
         public static Timer timer;
         public static bool HasInternet;
+        public static User currentUser;
 
         public App()
         {
@@ -61,39 +58,6 @@ namespace DC
 
         protected override void OnResume()
         {
-        }
-
-        public static TokenDatabaseController TokenDB
-        {
-            get
-            {
-                if (tokenDB == null)
-                {
-                    tokenDB = new TokenDatabaseController();
-                }
-                return tokenDB;
-            }
-        }
-        public static UserDatabaseController UserDB
-        {
-            get
-            {
-                if (userDB == null)
-                {
-                    userDB = new UserDatabaseController();
-                }
-                return userDB;
-            }
-        }
-
-        public static RestService RestService
-        {
-            get{
-                if (restService == null) {
-                    restService = new RestService();
-                }
-                return restService;
-            }
         }
 
         

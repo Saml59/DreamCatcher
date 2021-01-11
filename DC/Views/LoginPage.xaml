@@ -24,6 +24,7 @@
                 <Label x:Name="Lb_Password" Text="Password"/>
                 <Entry x:Name="En_Password" Placeholder="Password" IsSpellCheckEnabled="False" IsTextPredictionEnabled="True" IsPassword="True"/>
                 <Button x:Name="SignIn_Btn" Text="Sign in" Clicked="SignInProcess"/>
+                <Button x:Name="Register_Btn" Text="Register" Clicked="Register" />
 
         </StackLayout>
     </StackLayout>
