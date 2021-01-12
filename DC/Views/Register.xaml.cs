@@ -1,12 +1,13 @@
 ﻿using System;
 using Xamarin.Forms;
 using Amazon;
-using Amazon.DynamoDBv2.DataModel;
 using DC.Models;
 using DC.ViewModels;
-using Amazon.DynamoDBv2.DocumentModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RestSharp;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DC.Views
 {
@@ -39,25 +40,47 @@ namespace DC.Views
                 return;
             }
             //check to make sure a person did not input a ridiculous age (>90)
-            if (Birthdate.Date.Year <= 1930)
+            if (Birthdate.Date.Year <= 1920)
             {
-                await DisplayAlert("Error", "You are not over 90 years old", "Guilty as Charged");
+                await DisplayAlert("Error", "You are not over 100 years old", "Guilty as Charged");
                 En_Password.Text = "";
                 En_Password_Confirm.Text = "";
                 return;
             }
-
-
-
+            string email = En_Email.Text;
             string username = En_Username.Text;
             string password = En_Password.Text;
             string firstname = En_FirstName.Text;
+            string middleinitial = En_MiddleInitial.Text;
             string lastname = En_LastName.Text;
             var dob = Birthdate.Date;
             int day = dob.Day;
             int month = dob.Month;
             int year = dob.Year;
-            User user = new User(username, password, firstname, lastname, month, day, year);
+            int role_index = Role_Picker.SelectedIndex;
+            string role = "";
+
+            //determine the role based on the index
+            User user;
+            if (role_index == 0)
+            {
+                role = "student";
+                user = new Student(email, username, password, firstname, middleinitial, lastname, month, day, year, role);
+            }
+            else if (role_index == 1)
+            {
+                role = "tutor";
+                user = new Tutor(email, username, password, firstname, middleinitial, lastname, month, day, year, role);
+            }
+            else if (role_index == 2)
+            {
+                role = "instructor";
+                user = new Instructor(email, username, password, firstname, middleinitial, lastname, month, day, year, role);
+            }
+            else
+            {
+                user = new User(email, username, password, firstname, middleinitial, lastname, month, day, year, role);
+            }
             await sendData(user);
             //TODO: check for properly inputted information, internet connection, and then send data to the server
             if (!sentInfo)
@@ -69,25 +92,25 @@ namespace DC.Views
 
         private async Task sendData(User user)
         {
-            // Initialize the Amazon Cognito credentials provider
-            var credentials = new Amazon.CognitoIdentity.CognitoAWSCredentials("us-east-1:68f3ffe2-5c4c-4f76-9d2b-a82b20f93716", Amazon.RegionEndpoint.USEast1);
-            var client = new Amazon.DynamoDBv2.AmazonDynamoDBClient(credentials, Amazon.RegionEndpoint.USEast1);
-            DynamoDBContext context = new DynamoDBContext(client);
-            //check that the username is not in the accounts already
-            User sameUsername = await context.LoadAsync<User>(user.Username);
-            if (sameUsername != null)
+            var client = new RestClient(Constant.BaseURL);
+            string serialized_user = JsonSerializer.Serialize(user);
+            var request = new RestRequest("users/").AddJsonBody(serialized_user);
+            var response = await client.PostAsync<Generic_Response<Tokens>>(request);
+            if (response.success)
             {
-                await DisplayAlert("Error", "Username already taken", "OK");
+                
+                user.User_tokens = response.data;
+                sentInfo = true;
+                return;
+            }
+            else 
+            {
+                await DisplayAlert("Error", response.error, "OK");
                 En_Username.Text = "";
                 En_Password.Text = "";
                 En_Password_Confirm.Text = "";
                 sentInfo = false;
                 return;
-            }
-            else
-            {
-                await context.SaveAsync(user);
-                sentInfo = true;
             }
 
         }

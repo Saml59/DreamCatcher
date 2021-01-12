@@ -2,9 +2,13 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Class="DC.Views.Register">
     <ContentPage.Content>
         <StackLayout>
+            <Label x:Name="Lb_Email" Text="Email"/>
+            <Entry x:Name="En_Email" Placeholder="Email"/>
             <Label x:Name="Lb_FirstName" Text="First Name"/>
             <Entry x:Name="En_FirstName" Placeholder="First Name"/>
             <Label x:Name="Lb_LastName" Text="Last Name"/>
+            <Label x:Name="Lb_MiddleInitial" Text="Middle Initial"/>
+            <Entry x:Name="En_MiddleInitial" Placeholder="Middle Initial"/>
             <Entry x:Name="En_LastName" Placeholder="Last Name"/>
             <Label x:Name="Lb_Username" Text="Username (Min. 8 characters)"/>
             <Entry x:Name="En_Username" Placeholder="Username"/>
@@ -12,6 +16,16 @@
             <Entry x:Name="En_Password" Placeholder="Password" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
             <Label x:Name="Lb_Password_Confirm" Text="Confirm Password"/>
             <Entry x:Name="En_Password_Confirm" Placeholder="Confirm Password" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+            <Label x:Name="lb_Role" Text="Role"/>
+            <Picker x:Name="Role_Picker" Title="Choose a Role">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Student</x:String>
+                        <x:String>Tutor</x:String>
+                        <x:String>Instructor</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
             <Label x:Name="Lb_DOB" Text="Birthdate"/>
             <DatePicker x:Name="Birthdate" Date="{Binding Date}"/>
             <Button x:Name="CA" Text="Create Account" Clicked="createAccount"/>

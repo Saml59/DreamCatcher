@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 namespace DC.Models
 {
@@ -12,12 +13,18 @@ namespace DC.Models
         public static bool LoggedIn = false;
 
 
-        //Login
-        public static string LoginUrl = "http://test.com/api/Auth/Login";
+        //Backend info
+        public static string BaseURL = "localhost:5000/api";
 
 
         public Constant()
         {
         }
+    }
+    public class Generic_Response<T>
+    {
+        public Boolean success { get; set; }
+        public T data { get; set; }
+        public string error { get; set; }
     }
 }

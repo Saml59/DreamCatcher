@@ -6,8 +6,10 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using System.Text;
 using System.Security.Cryptography;
-using Amazon.DynamoDBv2.DataModel;
 using System.Threading.Tasks;
+using RestSharp;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DC.Views
 {
@@ -51,33 +53,46 @@ namespace DC.Views
                 await Navigation.PopAsync();
                 
             }
-            else await DisplayAlert("Login", "Login Not Successful", "OK");
         }
         
         private async Task<Boolean> checkInformation()
         {
-            // Initialize the Amazon Cognito credentials provider
-            var credentials = new Amazon.CognitoIdentity.CognitoAWSCredentials("us-east-1:68f3ffe2-5c4c-4f76-9d2b-a82b20f93716", Amazon.RegionEndpoint.USEast1);
-            var client = new Amazon.DynamoDBv2.AmazonDynamoDBClient(credentials, Amazon.RegionEndpoint.USEast1);
-            DynamoDBContext context = new DynamoDBContext(client);
-            User serverUser = await context.LoadAsync<User>(En_Username.Text);
-            if (serverUser == null)
+            string username = En_Username.Text;
+            var client = new RestClient(Constant.BaseURL);
+            var salt_request = new RestRequest("users/salt/").AddJsonBody(new LoginInfo(username, null));
+            var salt_response = await client.GetAsync<Generic_Response<Dictionary<string, string>>>(salt_request);
+            if (!salt_response.success)
             {
-                await DisplayAlert("Error", "Username and/or Password are incorrect", "OK");
+                await DisplayAlert("Error", salt_response.error, "OK");
                 En_Password.Text = "";
                 return false;
             }
-            string salt = serverUser.Salt;
-            string passHash = getHashedPassword(salt);
-            if (serverUser.Passhash != passHash)
+            string salt = salt_response.data["salt"];
+            string passhash = getHashedPassword(salt);
+            var request = new RestRequest("login/").AddJsonBody(new LoginInfo(username, passhash));
+            var response = await client.PostAsync<Generic_Response<Tokens>>(request);
+            if (!response.success)
             {
-                await DisplayAlert("Error", "Username and/or Password are incorrect", "OK");
+                await DisplayAlert("Error", response.error, "OK");
                 En_Password.Text = "";
                 return false;
             }
             else
             {
-                App.currentUser = serverUser;
+                var user_request = new RestRequest("users/current/");
+                string authheader = "Bearer " + response.data.SessionToken;
+                user_request.AddHeader("Authorization", authheader);
+                var user_response = await client.GetAsync<Generic_Response<User>>(user_request);
+                if (!user_response.success)
+                {
+                    await DisplayAlert("Error", user_response.error, "OK");
+                    En_Password.Text = "";
+                    return false;
+                }
+                App.currentUser = user_response.data;
+                App.currentUser.User_tokens = response.data;
+                App.currentUser.Passhash = passhash;
+                App.currentUser.Salt = salt;
                 return true;
             }
 
