@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using RestSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RestSharp.Serializers.SystemTextJson;
 
 namespace DC.Views
 {
@@ -58,20 +59,19 @@ namespace DC.Views
         private async Task<Boolean> checkInformation()
         {
             string username = En_Username.Text;
-            var client = new RestClient(Constant.BaseURL);
-            var salt_request = new RestRequest("users/salt/").AddJsonBody(new LoginInfo(username, null));
-            var salt_response = await client.GetAsync<Generic_Response<Dictionary<string, string>>>(salt_request);
-            if (!salt_response.success)
+            var api_client = new APICall("users/salt/", "POST", new LoginInfo(username, null));
+            var salt_response = await api_client.make_call<string>();
+            if (!salt_response.success) //Unable to get salt
             {
                 await DisplayAlert("Error", salt_response.error, "OK");
                 En_Password.Text = "";
                 return false;
             }
-            string salt = salt_response.data["salt"];
+            string salt = salt_response.data;
             string passhash = getHashedPassword(salt);
-            var request = new RestRequest("login/").AddJsonBody(new LoginInfo(username, passhash));
-            var response = await client.PostAsync<Generic_Response<Tokens>>(request);
-            if (!response.success)
+            var api_login_client = new APICall("login/", "POST", new LoginInfo(username, passhash));
+            var response = await api_login_client.make_call<Tokens>();
+            if (!response.success) //Unable to log in
             {
                 await DisplayAlert("Error", response.error, "OK");
                 En_Password.Text = "";
@@ -79,10 +79,11 @@ namespace DC.Views
             }
             else
             {
-                var user_request = new RestRequest("users/current/");
-                string authheader = "Bearer " + response.data.SessionToken;
-                user_request.AddHeader("Authorization", authheader);
-                var user_response = await client.GetAsync<Generic_Response<User>>(user_request);
+                Tokens tokens = response.data;
+                var api_user_call = new APICall("users/current/", "GET");
+                string authheader = "Bearer " + tokens.SessionToken;
+                api_user_call.addHeader("Authorization", authheader);
+                var user_response = await api_user_call.make_call<User>();
                 if (!user_response.success)
                 {
                     await DisplayAlert("Error", user_response.error, "OK");
@@ -90,7 +91,7 @@ namespace DC.Views
                     return false;
                 }
                 App.currentUser = user_response.data;
-                App.currentUser.User_tokens = response.data;
+                App.currentUser.User_tokens = tokens;
                 App.currentUser.Passhash = passhash;
                 App.currentUser.Salt = salt;
                 return true;

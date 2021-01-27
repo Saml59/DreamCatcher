@@ -25,8 +25,16 @@ namespace DC.Models
         public string MiddleInitial { get; set; }
         [JsonInclude, JsonPropertyName("last_name")]
         public string LastName { get; set; }
+        [JsonIgnore]
+        public DateTime DOB { get; set; }
         [JsonInclude, JsonPropertyName("dob")]
-        public string DOB_ISO { get; set; }
+        public string DOB_str { get { return DOB_str; } set { DOB = DateTime.Parse(value); DOB_str = value; } }
+        [JsonInclude, JsonPropertyName("dob_year")]
+        public int DOB_Year { get { return DOB.Year; }}
+        [JsonInclude, JsonPropertyName("dob_month")]
+        public int DOB_Month { get { return DOB.Month; } }
+        [JsonInclude, JsonPropertyName("dob_day")]
+        public int DOB_day { get { return DOB.Day; } }
         [JsonInclude, JsonPropertyName("role")]
         public string Role { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault), JsonPropertyName("section")]
@@ -46,8 +54,23 @@ namespace DC.Models
             this.FirstName = FirstName;
             this.MiddleInitial = MiddleInitial;
             this.LastName = LastName;
-            this.DOB_ISO = DOBYear.ToString() + "-" + DOBMonth.ToString() + "-" + DOBDay.ToString();
+            this.DOB_str = DOBYear.ToString() + "-" + DOBMonth.ToString() + "-" + DOBDay.ToString();
             this.Role = role;
+        }
+
+        [JsonConstructor]
+        public User(int id, string email, string username, string first_name, string middle_initial, string last_name, string role, string dob, Section section, string notes)
+        {
+            this.ID = id;
+            this.Email = email;
+            this.Username = username;
+            this.FirstName = first_name;
+            this.MiddleInitial = middle_initial;
+            this.LastName = last_name;
+            this.Role = role;
+            this.DOB_str = dob;
+            this.User_Section = section;
+            this.Notes = notes;
         }
 
 
@@ -127,17 +150,11 @@ namespace DC.Models
         [JsonInclude, JsonPropertyName("session_token")]
         public string SessionToken { get; set; }
         [JsonInclude, JsonPropertyName("session_expiration")]
-        public DateTime SessionExpiration { get; set; }
+        public string SessionExpiration { get; set; }
         [JsonInclude, JsonPropertyName("refresh_token")]
         public string RefreshToken  { get; set; }
-
-        public Tokens(string session_token, string str_session_expiration, string refresh_token)
-        {
-            this.SessionExpiration = DateTime.Parse(str_session_expiration);
-            this.SessionToken = session_token;
-            this.RefreshToken = refresh_token;
-
-        }
+        [JsonIgnore]
+        public DateTime Expiration { get { return DateTime.Parse(SessionExpiration); } }
 
     }
 
@@ -145,7 +162,7 @@ namespace DC.Models
     {
         [JsonInclude, JsonPropertyName("username")]
         public string Username;
-        [JsonIgnore(Condition =JsonIgnoreCondition.WhenWritingNull), JsonPropertyName("passhash")]
+        [JsonInclude, JsonPropertyName("passhash")]
         public string Passhash;
 
         public LoginInfo(string username, string passhash)

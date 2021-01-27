@@ -14,7 +14,7 @@ namespace DC.Models
 
 
         //Backend info
-        public static string BaseURL = "localhost:5000/api";
+        public static string BaseURL = "http://localhost:5000/api";
 
 
         public Constant()

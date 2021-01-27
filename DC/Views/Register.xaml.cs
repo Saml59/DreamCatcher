@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using RestSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RestSharp.Serializers.SystemTextJson;
 
 namespace DC.Views
 {
@@ -93,9 +94,18 @@ namespace DC.Views
         private async Task sendData(User user)
         {
             var client = new RestClient(Constant.BaseURL);
-            string serialized_user = JsonSerializer.Serialize(user);
-            var request = new RestRequest("users/").AddJsonBody(serialized_user);
-            var response = await client.PostAsync<Generic_Response<Tokens>>(request);
+            client.UseSystemTextJson();
+            var serialized_user = JsonSerializer.Serialize(user);
+            var request = new RestRequest("users/", Method.POST).AddJsonBody(serialized_user);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var iresponse = await client.ExecuteAsync(request);
+            if (!iresponse.IsSuccessful)
+            {
+                await DisplayAlert("Error", iresponse.ErrorMessage, "OK");
+                return;
+            }
+            Generic_Response<Tokens> response = JsonSerializer.Deserialize<Generic_Response<Tokens>>(iresponse.Content);
+
             if (response.success)
             {
                 
